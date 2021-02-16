@@ -10,7 +10,7 @@ import pandas as pd
 
 parser = argparse.ArgumentParser(description='Собирает с bustime.ru информацию об автобусах и их координатах за определённый день. Пакует в csv.')
 parser.add_argument('--city', required=True, help='Город в формате bustime. Например, "nizhniy-novgorod"')
-parser.add_argument('--date', help='Дата в формате гггг-мм-дд. Если не указана, берётся текущая дата.')
+parser.add_argument('--date', help='Дата в формате гггг-мм-дд. Если не указана, берётся вчерашняя дата.')
 parser.add_argument('--out-folder', required=True,
                       help='Путь до папки, в которую складывать итоговый csv')
 options = parser.parse_args()
@@ -18,7 +18,7 @@ options = parser.parse_args()
 city = options.city
 dt = options.date
 if not dt:
-    dt = datetime.now().strftime('%Y-%m-%d')
+    dt = (datetime.now() - imedelta(days=1)).strftime('%Y-%m-%d')
 
 if not os.path.exists(options.out_folder):
     os.makedirs(options.out_folder)
