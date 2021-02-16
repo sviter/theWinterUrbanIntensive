@@ -1,3 +1,6 @@
+import argparse
+from datetime import datetime
+import os
 import requests
 import lxml
 from bs4 import BeautifulSoup
@@ -5,10 +8,25 @@ import re
 import time
 import pandas as pd
 
+parser = argparse.ArgumentParser(description='Собирает с bustime.ru информацию об автобусах и их координатах за определённый день. Пакует в csv.')
+parser.add_argument('--city', required=True, help='Город в формате bustime. Например, "nizhniy-novgorod"')
+parser.add_argument('--date', help='Дата в формате гггг-мм-дд. Если не указана, берётся текущая дата.')
+parser.add_argument('--out-folder', required=True,
+                      help='Путь до папки, в которую складывать итоговый csv')
+options = parser.parse_args()
+
+city = options.city
+dt = options.date
+if not dt:
+    dt = datetime.now().strftime('%Y-%m-%d')
+
+if not os.path.exists(options.out_folder):
+    os.makedirs(options.out_folder)
+out_file_path = os.path.join(options.out_folder, '%s.csv' % dt)
+
 start_time = time.time()
 base_url = 'https://www.bustime.ru'
-city = 'nizhniy-novgorod'
-dt = '2021-02-13'
+
 bus_id = 0  # 8013
 rex_head = re.compile(r'\/%s\/transport\/%s\/(\S*)\/' % (city, dt), flags=0)
 rex_page = re.compile(r'\/%s\/transport\/%s\/page-(\d*)' % (city, dt), flags=0)
@@ -81,7 +99,7 @@ if pages is not None:
                                                                                                  '').replace('\n',
                                                                                                              '')
         df = pd.DataFrame(a)
-        df.to_csv('%s.csv' % dt, sep=';', index=False, mode='a',
+        df.to_csv(out_file_path, sep=';', index=False, mode='a',
                   header=False, encoding='utf-8-sig')
     # if 1 == len(pages):
     #     print(pages[0].get('href'))
