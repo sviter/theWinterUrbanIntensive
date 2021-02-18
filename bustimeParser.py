@@ -1,5 +1,6 @@
 import argparse
 from datetime import datetime
+from datetime import timedelta
 import os
 import requests
 import lxml
@@ -18,7 +19,7 @@ options = parser.parse_args()
 city = options.city
 dt = options.date
 if not dt:
-    dt = (datetime.now() - imedelta(days=1)).strftime('%Y-%m-%d')
+    dt = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
 
 if not os.path.exists(options.out_folder):
     os.makedirs(options.out_folder)
